@@ -23,6 +23,7 @@ import hashlib
 import re
 import json
 import datetime
+import time
 
 from google.appengine.ext import db
 from collections import namedtuple
@@ -32,6 +33,7 @@ template_dir = os.path.join(os.path.dirname(__file__), 'templates')    # __file_
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
                                autoescape = True)
 
+CACHE = {}
 
 ### MODELS ###
 
@@ -82,6 +84,37 @@ def valid_pw(name, pw, h):
     if make_pw_hash(name,pw,salt) == h:
         return True
 
+def cache_get(key):
+    global CACHE
+    return CACHE.get(key)
+
+def cache_update(key, value):
+    global CACHE
+    CACHE.update({key: value})
+
+def cache_clear():
+    global CACHE
+    CACHE.clear()
+
+def get_top10():
+    global CACHE
+    stmt = "SELECT * FROM BlogPosts ORDER BY created DESC LIMIT 10"
+    key = stmt
+    if key not in CACHE:
+        posts_from_db = db.GqlQuery(stmt)
+        posts_list = list(posts_from_db)    
+        cache_update(key, tuple([posts_list, time.time()]))
+    v, t = cache_get(key)
+    return v, int(time.time()-t)
+
+def get_perm(entry_id):
+    global CACHE
+    key = db.Key.from_path('BlogPosts', int(entry_id))    # Look for a post by entry_id
+    if key not in CACHE:
+        bp = db.get(key)
+        cache_update(key, tuple([bp, time.time()]))
+    v,t = cache_get(key)
+    return v, int(time.time()-t)
 
 ### HELPER CLASSES ###
 
@@ -125,12 +158,12 @@ class BaseRedirect(webapp2.RequestHandler):
 class MainPage(Handler):
     """Basic landing page"""
     def get(self, json):
-        posts_from_db = db.GqlQuery("SELECT * FROM BlogPosts ORDER BY created DESC")
-
+        posts_list, update_time = get_top10()
+        
         if json:
-            self.json(posts=posts_from_db)
+            self.json(posts=posts_list)
         else:
-            self.render("main.html",posts=posts_from_db)
+            self.render("main.html",posts=posts_list, time=update_time)
 
 
 class NewPost(Handler):
@@ -154,12 +187,12 @@ class NewPost(Handler):
             entry_data['error'] = "You need both a valid subject and content."
             self.get(**entry_data)    # redirect to the same page and re-render with error messages
 
+        cache_clear()
 
 class Permalink(Handler):
     """Links to each individual post"""
     def get(self, entry_id, json):
-        key = db.Key.from_path('BlogPosts', int(entry_id))    # Look for a post by entry_id
-        bp = db.get(key)
+        bp, update_time = get_perm(entry_id)
         
         if not bp:
             self.redirect('/404')    # Kludge way to use the built-in 404 handler (for consistency)
@@ -168,7 +201,7 @@ class Permalink(Handler):
         if json:
             self.json(posts=[bp])
         else:
-            self.render("main.html", posts=[bp], menu="home")
+            self.render("main.html", posts=[bp], menu="home", time=update_time)
 
 
 class Signup(Handler):
@@ -256,6 +289,12 @@ class Welcome(Handler):
         else:
             self.render("welcome.html",username=user.username)
 
+class Flush(Handler):
+    """Redirect to blog homepage"""
+    def get(self):
+        cache_clear()
+        self.redirect('/blog')
+
 
 app = webapp2.WSGIApplication([
     ('/', BaseRedirect),
@@ -265,5 +304,6 @@ app = webapp2.WSGIApplication([
     ('/blog/signup', Signup),
     ('/blog/login', Login),
     ('/blog/logout', Logout),
-    ('/blog/welcome', Welcome)
+    ('/blog/welcome', Welcome),
+    ('/blog/flush', Flush)
    ], debug=True)
