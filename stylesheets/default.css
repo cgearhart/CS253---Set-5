@@ -1,0 +1,119 @@
+/* Section formatting */
+
+html {
+  font-family: arial, helvetica, sans-serif;
+  background-color: #ddfddd;
+  height:100%;
+}
+
+body {
+	font-size: 90%;
+	color: black;
+	margin: 0px;
+	margin-left: auto;
+	margin-right: auto;
+	width: 600px;
+  height:100%;
+}
+
+header {
+  margin: inherit;
+}
+
+nav {
+  margin: 0 0 10px 0;
+  padding: 0;
+  overflow: auto;
+  width: 100%;
+}
+
+section {
+  margin: 0 0 10px 0;
+}
+
+#content {
+  background-color: #ffe;
+  border-width: 0 1px;
+  border-style: solid;
+  border-color: #aaa;
+  padding: 0 15px;
+  height:100%;
+  min-height:100%;
+}
+
+
+/* Position & layout */
+
+.headline {
+  display: block;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #bfbfbf;
+  overflow: auto;
+  width: 100%;
+}
+
+.left-align {
+  float: left;
+  text-align: left;
+}
+
+.right-align {
+  float: right;
+  text-align: right;
+}
+
+
+/* Font formatting */
+
+h1 {
+  font-size: 3em;
+  margin: 0 0 5px 0;
+  padding: 0.1em 0;
+  text-align: center;
+  letter-spacing: 0.5em;
+  border-bottom-style: solid;
+  border-bottom-width: 5px;
+  border-bottom-color: #c00;
+}
+
+h2 {
+  color: #999;
+  font-size: 1.25em;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+  color: #000;
+}
+
+article p {
+  margin: .5em 10px;
+  line-height: 1.5em; 
+}
+
+.error {
+  color: red;
+}
+
+
+/* Form layout */
+
+form label {
+  color: black;
+  margin: 0;
+  padding: 0;
+  font-size: 1.25em;
+}
+
+input.title {
+  width: 100%;
+}
+
+textarea.contents {
+  width: 100%;
+  height: 100px;
+  resize: none;
+}

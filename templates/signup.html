@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Psych! - Sign Up</title>
+        <link rel="stylesheet" type="text/css" href="../stylesheets/default.css">
+    </head>
+    
+    <body>
+        <div id="content">
+
+            <header>
+                <h1>Fake Blog</h1>
+            </header>
+            
+            <nav>
+                <div class="left-align">
+                    <a href="/blog">Home</a>
+                </div>
+                <div class="right-align">
+                    {% if signedIn %} 
+                        <a href="/blog/logout">Log Out</a>
+                    {% else %}
+                        <a href="/blog/signup">Sign Up</a> | <a href="/blog/login">Log In</a>
+                    {% endif %}
+                </div>
+            </nav>
+
+
+            
+            <div class="form">
+                
+                <form method="post">
+                    <table>
+                        <tr>
+                            <td>Username</td>
+                            <td><input type="text" name="username" value="{{username}}"></td>
+                            <td class="error">{{error.username}}</td>
+                        </tr>
+                        <tr>
+                            <td>Password</td>
+                            <td><input type="password" name="password"></td>
+                            <td class="error">{{error.password}}</td>
+                        </tr>
+                        <tr>
+                            <td>Verify Password</td>
+                            <td><input type="password" name="verify"></td>
+                            <td class="error">{{error.verify}}</td>
+                        </tr>
+                        <tr>
+                            <td>E-mail (optional)</td>
+                            <td><input type="text" name="email" value="{{email}}"></td>
+                            <td class="error">{{error.email}}</td>
+                        </tr>
+                    </table>
+                    <input type="submit">
+                </form>
+            </div>
+        </div>
+    </body>
+</html>
